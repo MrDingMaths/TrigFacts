@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trig Facts Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <!-- MathJax for beautiful math rendering -->
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['$','$'], ['\\(','\\)']],
+                displayMath: [['$$','$$'], ['\\[','\\]']],
+                processEscapes: true
+            },
+            "HTML-CSS": { linebreaks: { automatic: true } },
+            SVG: { linebreaks: { automatic: true } },
+            // Prevents flicker by hiding math until it's rendered
+            messageStyle: "none" 
+        });
+    </script>
+    <style>
+        /* Base styles are kept identical for consistency */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .card {
+            background-color: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease-in-out;
+            width: 95%;
+            max-width: 700px;
+        }
+        .btn {
+            display: inline-block;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #4338ca;
+        }
+        .btn-secondary {
+            background-color: #10b981;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #059669;
+        }
+        .question-text {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 700;
+            color: #1f2937;
+            letter-spacing: 1px;
+        }
+        .feedback {
+            height: 2.5rem; /* Increased height for rendered math */
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .feedback-correct { color: #10b981; }
+        .feedback-incorrect { color: #ef4444; }
+        
+        .level-section-title {
+            text-align: left;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #374151;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+        .level-btn {
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+        }
+        .level-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .level-title {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .best-time {
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+        
+        /* Rating-based colors */
+        .rating-none { background-color: #f3f4f6; color: #374151; }
+        .rating-apprentice { background-color: #dcfce7; color: #166534; border-color: #86efac; }
+        .rating-pro { background-color: #a7f3d0; color: #047857; border-color: #6ee7b7; }
+        .rating-expert { background-color: #6ee7b7; color: #065f46; border-color: #34d399; }
+        .rating-mastery { background: linear-gradient(145deg, #fde047, #facc15); color: #a16207; border-color: #f59e0b; }
+        .rating-true-mastery { background: linear-gradient(145deg, #fce7f3, #f9a8d4); color: #9d174d; border-color: #f472b6; }
+        
+        #confetti-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;
+        }
+
+        /* MCQ Button Styles */
+        .mcq-btn {
+            background-color: #fff;
+            border: 2px solid #d1d5db;
+            color: #374151;
+            font-weight: 600;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease-in-out;
+            font-size: 1.1rem; /* Slightly larger font for math */
+        }
+        .mcq-btn:hover:not(:disabled) {
+            border-color: #4f46e5;
+            color: #4f46e5;
+            transform: translateY(-2px);
+        }
+        .mcq-btn.correct {
+            background-color: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+        .mcq-btn.incorrect {
+            background-color: #ef4444;
+            border-color: #ef4444;
+            color: white;
+            opacity: 0.7;
+        }
+        
+        /* Style to prevent flash of unstyled math. Elements are hidden by default. */
+        .math-container {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out;
+        }
+        /* This class is added by JS after MathJax is done, triggering the fade-in. */
+        .math-container.is-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="container mx-auto text-center">
+
+        <div id="settings-screen" class="card mx-auto">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Trig Facts Challenge</h1>
+            <p class="text-gray-600 mb-8">Select a level. Get 10 in a row to set your best time!</p>
+            <div id="level-selection-container"></div>
+        </div>
+
+        <div id="game-screen" class="card mx-auto hidden">
+            <div class="flex justify-between items-center mb-6 text-lg">
+                <div class="font-semibold text-gray-700">Streak: <span id="streak-counter" class="font-bold text-indigo-600 text-xl">0</span>🔥</div>
+                <div class="font-semibold text-gray-700">Time: <span id="timer" class="font-bold text-indigo-600 text-xl">00:00</span></div>
+            </div>
+            
+            <!-- Quadrant Diagram Container -->
+            <div id="diagram-container" class="my-4 hidden">
+                <canvas id="quadrant-diagram" width="300" height="300" class="mx-auto bg-white rounded-lg shadow-inner border border-gray-200"></canvas>
+            </div>
+
+            <div id="question-container" class="my-8 min-h-[60px] flex items-center justify-center math-container">
+                <p id="question-text" class="question-text"></p>
+            </div>
+            
+            <!-- MCQ Options Container -->
+            <div id="mcq-options-container" class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 math-container"></div>
+
+            <div id="feedback-message" class="feedback my-4 text-lg math-container"></div>
+            <button id="quit-btn" class="mt-6 text-gray-500 hover:text-gray-700 font-semibold">Back to Levels</button>
+        </div>
+
+        <div id="success-screen" class="card mx-auto hidden">
+            <h2 class="text-3xl md:text-4xl font-bold text-green-500 mb-4">🎉 Challenge Complete! 🎉</h2>
+            <p class="text-gray-700 text-xl mb-2">You got 10 in a row for <span id="completed-level" class="font-bold"></span>!</p>
+            <p class="text-gray-700 text-xl mb-4">Your time: <span id="final-time" class="font-bold text-indigo-600"></span></p>
+            <div id="rating-info" class="bg-indigo-100 text-indigo-800 rounded-xl p-4 mb-6">
+                <p class="text-lg font-semibold">Rating: <span id="final-rating" class="font-bold"></span></p>
+                <p id="best-time-message" class="mt-1 font-medium"></p>
+                <p id="rating-explanation" class="text-sm mt-2 text-indigo-700"></p>
+            </div>
+            <button id="play-again-btn" class="btn btn-secondary w-full max-w-xs mx-auto text-lg">Back to Levels</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Trig Facts Challenge Game
+        const TrigFactsGame = (() => {
+            
+            // ==================== Configuration ====================
+            const CONFIG = {
+                LEVEL_GROUPS: {
+                    "Exact Values: Degrees": [
+                        { key: 'exact_deg_mixed', name: 'Mixed Practice', type: 'exact', unit: 'deg' },
+                    ],
+                    "Unit Conversion": [
+                        { key: 'conv_mixed', name: 'Mixed Conversion', type: 'conversion', direction: 'mixed' },
+                        { key: 'deg_to_rad', name: 'Degrees to Radians', type: 'conversion', direction: 'd2r' },
+                        { key: 'rad_to_deg', name: 'Radians to Degrees', type: 'conversion', direction: 'r2d' },
+                    ],
+                    "Exact Values: Radians": [
+                        { key: 'exact_rad_mixed', name: 'Mixed Practice', type: 'exact', unit: 'rad' },
+                    ],
+                    "Quadrants & Equivalents": [
+                        { key: 'quad_deg', name: 'Quadrants <br>[0, 360°]', type: 'quadrant', unit: 'deg' },
+                        { key: 'quad_rad', name: 'Quadrants <br>[0, 2π]', type: 'quadrant', unit: 'rad' },
+                        { key: 'equiv_deg', name: 'Equivalent Angles (°)', type: 'equivalent', unit: 'deg' },
+                        { key: 'equiv_rad', name: 'Equivalent Angles (rad)', type: 'equivalent', unit: 'rad' },
+                    ],
+                },
+                REQUIRED_STREAK: 10,
+                FEEDBACK_DELAY_CORRECT: 300,
+                FEEDBACK_DELAY_INCORRECT: 1500,
+                POSITIVE_FEEDBACK: ["Correct!", "Excellent!", "Nice one!", "Perfect!", "You know it!"],
+                RATING_THRESHOLDS: [
+                    { maxAvg: 3, name: "💖 Unit Circle Queen 💖", key: "true-mastery" },
+                    { maxAvg: 4, name: "⚡️ Trig Master ⚡️", key: "mastery" },
+                    { maxAvg: 6, name: "Expert", key: "expert" },
+                    { maxAvg: 8, name: "Pro", key: "pro" },
+                    { maxAvg: Infinity, name: "Apprentice", key: "apprentice" }
+                ],
+                STORAGE_PREFIX: 'tf_bestTime_v4_final_', // Updated version key
+                CONFETTI: { CORRECT: 40, SUCCESS: 150 }
+            };
+
+            // ==================== Game State Manager (Unchanged) ====================
+            class GameState {
+                constructor() { this.reset(); }
+                reset() {
+                    this.currentLevel = null;
+                    this.correctAnswer = null;
+                    this.correctStreak = 0;
+                }
+                setLevel(level) { this.reset(); this.currentLevel = level; }
+                incrementStreak() { return ++this.correctStreak; }
+                resetStreak() { this.correctStreak = 0; }
+                isComplete() { return this.correctStreak >= CONFIG.REQUIRED_STREAK; }
+            }
+
+            // ==================== Question Generator (Unchanged) ====================
+            class QuestionGenerator {
+                constructor() {
+                    // Using MathJax compatible strings and numeric values for sorting
+                    this.TRIG_VALUES = [
+                        { deg: '0°',   rad: '$0$',      sin: '$0$',    cos: '$1$',    tan: '$0$',         val: { sin: 0, cos: 1, tan: 0 } },
+                        { deg: '30°',  rad: '$\\frac{\\pi}{6}$', sin: '$\\frac{1}{2}$',  cos: '$\\frac{\\sqrt{3}}{2}$', tan: '$\\frac{1}{\\sqrt{3}}$', val: { sin: 0.5, cos: Math.sqrt(3)/2, tan: 1/Math.sqrt(3) } },
+                        { deg: '45°',  rad: '$\\frac{\\pi}{4}$', sin: '$\\frac{1}{\\sqrt{2}}$', cos: '$\\frac{1}{\\sqrt{2}}$', tan: '$1$',         val: { sin: 1/Math.sqrt(2), cos: 1/Math.sqrt(2), tan: 1 } },
+                        { deg: '60°',  rad: '$\\frac{\\pi}{3}$', sin: '$\\frac{\\sqrt{3}}{2}$', cos: '$\\frac{1}{2}$',  tan: '$\\sqrt{3}$',        val: { sin: Math.sqrt(3)/2, cos: 0.5, tan: Math.sqrt(3) } },
+                        { deg: '90°',  rad: '$\\frac{\\pi}{2}$', sin: '$1$',    cos: '$0$',    tan: 'undefined', val: { sin: 1, cos: 0, tan: Infinity } },
+                    ];
+                    this.ALL_VALUES = this.TRIG_VALUES.flatMap(v => [v.sin, v.cos, v.tan]).filter((v, i, a) => a.indexOf(v) === i && v !== 'undefined');
+
+                    this.CONVERSIONS = [
+                        { deg: '120°', rad: '$\\frac{2\\pi}{3}$' }, { deg: '135°', rad: '$\\frac{3\\pi}{4}$' },
+                        { deg: '150°', rad: '$\\frac{5\\pi}{6}$' }, { deg: '180°', rad: '$\\pi$' },
+                        { deg: '210°', rad: '$\\frac{7\\pi}{6}$' }, { deg: '225°', rad: '$\\frac{5\\pi}{4}$' },
+                        { deg: '240°', rad: '$\\frac{4\\pi}{3}$' }, { deg: '270°', rad: '$\\frac{3\\pi}{2}$' },
+                        { deg: '300°', rad: '$\\frac{5\\pi}{3}$' }, { deg: '315°', rad: '$\\frac{7\\pi}{4}$' },
+                        { deg: '330°', rad: '$\\frac{11\\pi}{6}$'}, { deg: '360°', rad: '$2\\pi$' }
+                    ];
+                    this.ALL_ANGLES = this.TRIG_VALUES.concat(this.CONVERSIONS);
+                }
+
+                _getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+                
+                _getDistractors(correct, source, count = 5) {
+                    const distractors = new Set();
+                    distractors.add(correct);
+                    const filteredSource = source.filter(item => item !== correct);
+                    while (distractors.size < count + 1 && distractors.size < filteredSource.length + 1) {
+                        distractors.add(this._getRandom(filteredSource));
+                    }
+                    return Array.from(distractors).sort(() => Math.random() - 0.5);
+                }
+
+                _evalMath(str) {
+                    if (!str || typeof str !== 'string') return -Infinity;
+                    if (str.includes('undefined')) return Infinity;
+                    let s = str.replace(/\$/g, '').replace(/\\/g, '');
+                    s = s.replace(/sqrt\{(\d+)\}/g, 'Math.sqrt($1)');
+                    s = s.replace(/frac\{(.+?)\}\{(.+?)\}/g, '($1)/($2)');
+                    s = s.replace(/pi/g, 'Math.PI');
+                    try { return eval(s); } catch (e) { return -Infinity; }
+                }
+
+                _sortOptions(options) {
+                    return options.sort((a, b) => this._evalMath(a) - this._evalMath(b));
+                }
+
+                _generateExactValue(level) {
+                    const func = this._getRandom(['sin', 'cos', 'tan']);
+                    const displayFunc = '\\' + func; // Use \sin, \cos, \tan for display
+                    const isDeg = level.unit === 'deg';
+                    let a = this._getRandom(this.TRIG_VALUES);
+                    if (func === 'tan' && a.tan === 'undefined') {
+                        a = this._getRandom(this.TRIG_VALUES.filter(v => v.tan !== 'undefined'));
+                    }
+
+                    const angleText = isDeg ? a.deg : a.rad;
+                    const value = a[func];
+                    
+                    const type = Math.floor(Math.random() * 2);
+                    let question;
+                    if (type === 0) { // e.g., sin(30°) = ___
+                        const distractors = this._getDistractors(value, this.ALL_VALUES);
+                        const options = this._sortOptions(distractors);
+                        question = { format: `$${displayFunc}(${isDeg ? a.deg : a.rad.replace(/\$/g, '')}) = \\_\\_\\_$`, answer: value, options: options };
+                    } else { // e.g., sin(___) = 1/2
+                        const sourceAngles = this.TRIG_VALUES.map(v => isDeg ? v.deg : v.rad);
+                        const distractors = this._getDistractors(angleText, sourceAngles);
+                        const options = this._sortOptions(distractors);
+                        question = { format: `$${displayFunc}(\\_\\_\\_) = ${value.replace(/\$/g, '')}$`, answer: angleText, options: options };
+                    }
+                    return question;
+                }
+
+                _generateQuadrantValue(level) {
+                    const refAngleObj = this._getRandom(this.TRIG_VALUES.filter(a => parseInt(a.deg) > 0 && parseInt(a.deg) < 90));
+                    const quadrant = this._getRandom([2, 3, 4]);
+                    const func = this._getRandom(['sin', 'cos', 'tan']);
+                    const displayFunc = '\\' + func;
+                    const isDeg = level.unit === 'deg';
+
+                    const refAngleDeg = parseInt(refAngleObj.deg);
+                    let angleDeg;
+                    if (quadrant === 2) angleDeg = 180 - refAngleDeg;
+                    else if (quadrant === 3) angleDeg = 180 + refAngleDeg;
+                    else angleDeg = 360 - refAngleDeg;
+
+                    const angleObj = this.ALL_ANGLES.find(a => parseInt(a.deg) === angleDeg);
+                    const angleText = isDeg ? angleObj.deg : angleObj.rad;
+
+                    const CAST = { sin: [1, 2], cos: [1, 4], tan: [1, 3] };
+                    const isPositive = CAST[func].includes(quadrant);
+                    const value = refAngleObj[func];
+                    
+                    const answer = isPositive ? value : `$-${value.replace(/\$/g, '')}$`;
+                    
+                    const allPossibleValues = this.ALL_VALUES.flatMap(v => {
+                        if (v === '$0$') return [v];
+                        const strippedV = v.replace(/\$/g, '');
+                        return [v, `$-${strippedV}$`];
+                    });
+
+                    const distractors = this._getDistractors(answer, allPossibleValues);
+                    const options = this._sortOptions(distractors);
+
+                    return { format: `$${displayFunc}(${angleText.replace(/\$/g, '')}) = \\_\\_\\_$`, answer: answer, options, angleDeg: angleDeg };
+                }
+
+                _generateEquivalentRatio(level) {
+                    const isDeg = level.unit === 'deg';
+                    const func = this._getRandom(['sin', 'cos', 'tan']);
+                    const displayFunc = '\\' + func;
+
+                    const refAngles = this.TRIG_VALUES.filter(a => parseInt(a.deg) > 0 && parseInt(a.deg) < 90);
+                    const refAngleObj = this._getRandom(refAngles);
+                    const refAngleDeg = parseInt(refAngleObj.deg);
+                    const refAngleText = isDeg ? refAngleObj.deg : refAngleObj.rad.replace(/\$/g, '');
+
+                    const quadrant = this._getRandom([2, 3, 4]);
+                    let angleDeg;
+                    if (quadrant === 2) angleDeg = 180 - refAngleDeg;
+                    else if (quadrant === 3) angleDeg = 180 + refAngleDeg;
+                    else angleDeg = 360 - refAngleDeg;
+                    
+                    const angleObj = this.ALL_ANGLES.find(a => parseInt(a.deg) === angleDeg);
+                    const angleText = isDeg ? angleObj.deg : angleObj.rad.replace(/\$/g, '');
+
+                    const CAST = { sin: [1, 2], cos: [1, 4], tan: [1, 3] };
+                    const isPositive = CAST[func].includes(quadrant);
+                    const signChar = isPositive ? '' : '-';
+                    const answer = `$${signChar}${displayFunc}(${refAngleText})$`;
+
+                    const format = `$${displayFunc}(${angleText}) = \\_\\_\\_$`;
+
+                    const options = new Set();
+                    options.add(answer);
+
+                    const oppositeSignChar = isPositive ? '-' : '';
+                    options.add(`$${oppositeSignChar}${displayFunc}(${refAngleText})$`);
+
+                    const otherRefAngle = this._getRandom(refAngles.filter(a => a.deg !== refAngleObj.deg));
+                    if (otherRefAngle) {
+                        const otherRefAngleText = isDeg ? otherRefAngle.deg : otherRefAngle.rad.replace(/\$/g, '');
+                        options.add(`$${signChar}${displayFunc}(${otherRefAngleText})$`);
+                        options.add(`$${oppositeSignChar}${displayFunc}(${otherRefAngleText})$`);
+                    }
+                    
+                    const otherFunc = this._getRandom(['sin', 'cos', 'tan'].filter(f => f !== func));
+                    const otherDisplayFunc = '\\' + otherFunc;
+                    options.add(`$${signChar}${otherDisplayFunc}(${refAngleText})$`);
+                    options.add(`$${oppositeSignChar}${otherDisplayFunc}(${refAngleText})$`);
+
+                    let finalOptions = Array.from(options);
+                    while (finalOptions.length < 6) {
+                        const anotherRefAngle = this._getRandom(refAngles);
+                        const anotherRefAngleText = isDeg ? anotherRefAngle.deg : anotherRefAngle.rad.replace(/\$/g, '');
+                        finalOptions.push(`$-${displayFunc}(${anotherRefAngleText})$`);
+                        finalOptions = [...new Set(finalOptions)];
+                    }
+
+                    finalOptions = finalOptions.sort(() => Math.random() - 0.5).slice(0, 6);
+                    if (!finalOptions.includes(answer)) {
+                        finalOptions[0] = answer;
+                    }
+
+                    return { format: format, answer: answer, options: finalOptions.sort(() => Math.random() - 0.5), angleDeg: angleDeg };
+                }
+
+                _generateConversion(level) {
+                    const angle = this._getRandom(this.ALL_ANGLES);
+                    const direction = (level.direction === 'mixed') ? this._getRandom(['d2r', 'r2d']) : level.direction;
+
+                    if (direction === 'd2r') {
+                        const source = this.ALL_ANGLES.map(a => a.rad);
+                        const distractors = this._getDistractors(angle.rad, source);
+                        const options = this._sortOptions(distractors);
+                        return { format: `$${angle.deg} = \\_\\_\\_ \\text{ rad}$`, answer: angle.rad, options };
+                    } else { // r2d
+                        const source = this.ALL_ANGLES.map(a => a.deg);
+                        const distractors = this._getDistractors(angle.deg, source);
+                        const options = this._sortOptions(distractors);
+                        return { format: `$${angle.rad.replace(/\$/g, '')} = \\_\\_\\_^{\\circ}$`, answer: angle.deg, options };
+                    }
+                }
+
+                generate(level) {
+                    switch(level.type) {
+                        case 'exact':      return this._generateExactValue(level);
+                        case 'quadrant':   return this._generateQuadrantValue(level);
+                        case 'equivalent': return this._generateEquivalentRatio(level);
+                        case 'conversion': return this._generateConversion(level);
+                        default:           return { format: 'Error', answer: 'error', options: [] };
+                    }
+                }
+            }
+
+            // ==================== Storage Manager (Unchanged) ====================
+            class StorageManager {
+                static getBestTime(key) { return localStorage.getItem(`${CONFIG.STORAGE_PREFIX}${key}`) ? parseInt(localStorage.getItem(`${CONFIG.STORAGE_PREFIX}${key}`)) : null; }
+                static saveBestTime(key, time) { localStorage.setItem(`${CONFIG.STORAGE_PREFIX}${key}`, time); }
+                static getRating(seconds) {
+                    const avg = seconds / CONFIG.REQUIRED_STREAK;
+                    return CONFIG.RATING_THRESHOLDS.find(r => avg < r.maxAvg);
+                }
+            }
+
+            // ==================== Timer Manager (Unchanged) ====================
+            class Timer {
+                constructor(el) { this.displayElement = el; this.interval = null; this.seconds = 0; }
+                start() { this.stop(); this.seconds = 0; this.update(); this.interval = setInterval(() => { this.seconds++; this.update(); }, 1000); }
+                stop() { if (this.interval) { clearInterval(this.interval); this.interval = null; } }
+                reset() { this.stop(); this.seconds = 0; this.update(); }
+                update() {
+                    const m = Math.floor(this.seconds / 60).toString().padStart(2, '0');
+                    const s = (this.seconds % 60).toString().padStart(2, '0');
+                    this.displayElement.textContent = `${m}:${s}`;
+                }
+                getSeconds() { return this.seconds; }
+            }
+
+            // ==================== Confetti Manager (Unchanged) ====================
+            class ConfettiManager {
+                constructor(canvas) {
+                    this.canvas = canvas; this.ctx = canvas.getContext('2d'); this.particles = [];
+                    this.resizeCanvas(); window.addEventListener('resize', () => this.resizeCanvas()); this.animate();
+                }
+                resizeCanvas() { this.canvas.width = window.innerWidth; this.canvas.height = window.innerHeight; }
+                trigger(count) {
+                    const centerX = this.canvas.width / 2, centerY = this.canvas.height / 2;
+                    for (let i = 0; i < count; i++) {
+                        this.particles.push({
+                            x: centerX, y: centerY, radius: Math.random() * 3 + 2,
+                            color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+                            velocity: { x: (Math.random() - 0.5) * 15, y: (Math.random() - 0.5) * 15 },
+                            alpha: 1, friction: 0.98, gravity: 0.1
+                        });
+                    }
+                }
+                animate() {
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.particles = this.particles.filter(p => {
+                        p.velocity.x *= p.friction; p.velocity.y *= p.friction; p.velocity.y += p.gravity;
+                        p.x += p.velocity.x; p.y += p.velocity.y; p.alpha -= 0.01;
+                        if (p.alpha > 0) {
+                            this.ctx.save(); this.ctx.globalAlpha = p.alpha; this.ctx.beginPath();
+                            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                            this.ctx.fillStyle = p.color; this.ctx.fill(); this.ctx.restore();
+                            return true;
+                        }
+                        return false;
+                    });
+                    requestAnimationFrame(() => this.animate());
+                }
+            }
+
+            // ==================== UI Manager ====================
+            class UIManager {
+                constructor() {
+                    this.screens = { settings: document.getElementById('settings-screen'), game: document.getElementById('game-screen'), success: document.getElementById('success-screen') };
+                    this.elements = {
+                        levelContainer: document.getElementById('level-selection-container'),
+                        streakCounter: document.getElementById('streak-counter'),
+                        diagramContainer: document.getElementById('diagram-container'),
+                        diagramCanvas: document.getElementById('quadrant-diagram'),
+                        questionContainer: document.getElementById('question-container'),
+                        questionText: document.getElementById('question-text'),
+                        mcqOptionsContainer: document.getElementById('mcq-options-container'),
+                        feedbackMessage: document.getElementById('feedback-message'),
+                        quitBtn: document.getElementById('quit-btn'),
+                        playAgainBtn: document.getElementById('play-again-btn'),
+                        completedLevel: document.getElementById('completed-level'),
+                        finalTime: document.getElementById('final-time'),
+                        finalRating: document.getElementById('final-rating'),
+                        bestTimeMessage: document.getElementById('best-time-message'),
+                        ratingExplanation: document.getElementById('rating-explanation')
+                    };
+                }
+
+                showScreen(name) { Object.values(this.screens).forEach(s => s.classList.add('hidden')); this.screens[name].classList.remove('hidden'); }
+                
+                renderLevelGrid(levelGroups, onLevelSelect) {
+                    this.elements.levelContainer.innerHTML = '';
+                    for (const [groupName, levels] of Object.entries(levelGroups)) {
+                        const groupTitle = document.createElement('h2');
+                        groupTitle.className = 'level-section-title';
+                        groupTitle.textContent = groupName;
+                        this.elements.levelContainer.appendChild(groupTitle);
+
+                        const grid = document.createElement('div');
+                        grid.className = 'level-grid';
+                        levels.forEach(level => {
+                            const bestTime = StorageManager.getBestTime(level.key);
+                            const rating = bestTime ? StorageManager.getRating(bestTime).key : 'none';
+                            const displayText = bestTime ? `🏆 ${this.formatTime(bestTime)}` : 'No time yet';
+                            const button = document.createElement('button');
+                            button.className = `level-btn rating-${rating}`;
+                            button.innerHTML = `<div class="level-title">${level.name}</div><div class="best-time">${displayText}</div>`;
+                            button.addEventListener('click', () => onLevelSelect(level));
+                            grid.appendChild(button);
+                        });
+                        this.elements.levelContainer.appendChild(grid);
+                    }
+                }
+                
+                updateStreak(streak) {
+                    this.elements.streakCounter.textContent = streak;
+                }
+
+                showQuestion(question, levelType, onSelect) {
+                    // Show or hide the diagram based on level type
+                    if ((levelType === 'quadrant' || levelType === 'equivalent') && question.angleDeg !== undefined) {
+                        this.elements.diagramContainer.classList.remove('hidden');
+                        this.drawQuadrantDiagram(question.angleDeg);
+                    } else {
+                        this.elements.diagramContainer.classList.add('hidden');
+                    }
+
+                    // Hide math containers before changing content
+                    this.elements.questionContainer.classList.remove('is-visible');
+                    this.elements.mcqOptionsContainer.classList.remove('is-visible');
+
+                    this.elements.questionText.innerHTML = question.format;
+                    this.elements.mcqOptionsContainer.innerHTML = '';
+                    question.options.forEach(optionText => {
+                        const button = document.createElement('button');
+                        button.className = 'mcq-btn';
+                        button.innerHTML = optionText;
+                        button.dataset.answer = optionText;
+                        button.addEventListener('click', () => onSelect(optionText, button));
+                        this.elements.mcqOptionsContainer.appendChild(button);
+                    });
+                    this.clearFeedback();
+                    
+                    if (window.MathJax) {
+                        // Queue typesetting and then the fade-in animation
+                        MathJax.Hub.Queue(
+                            ["Typeset", MathJax.Hub, this.elements.questionContainer],
+                            ["Typeset", MathJax.Hub, this.elements.mcqOptionsContainer],
+                            () => {
+                                this.elements.questionContainer.classList.add('is-visible');
+                                this.elements.mcqOptionsContainer.classList.add('is-visible');
+                            }
+                        );
+                    } else {
+                        this.elements.questionContainer.classList.add('is-visible');
+                        this.elements.mcqOptionsContainer.classList.add('is-visible');
+                    }
+                }
+
+                drawQuadrantDiagram(angleDeg) {
+                    const canvas = this.elements.diagramCanvas;
+                    const ctx = canvas.getContext('2d');
+                    const size = 300; // Logical size
+
+                    // High-DPI scaling for crisp rendering
+                    const dpr = window.devicePixelRatio || 1;
+                    canvas.width = size * dpr;
+                    canvas.height = size * dpr;
+                    canvas.style.width = `${size}px`;
+                    canvas.style.height = `${size}px`;
+                    ctx.scale(dpr, dpr);
+
+                    const center = size / 2;
+                    const radius = size * 0.38;
+                    const angleRad = angleDeg * Math.PI / 180;
+                    const arrowSize = 6;
+
+                    ctx.clearRect(0, 0, size, size);
+                    
+                    // Draw Axes with arrowheads
+                    ctx.strokeStyle = '#d1d5db'; // gray-300
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    // X-axis
+                    ctx.moveTo(10, center);
+                    ctx.lineTo(size - 10, center);
+                    ctx.moveTo(size - 10 - arrowSize, center - arrowSize);
+                    ctx.lineTo(size - 10, center);
+                    ctx.lineTo(size - 10 - arrowSize, center + arrowSize);
+                    // Y-axis
+                    ctx.moveTo(center, size - 10);
+                    ctx.lineTo(center, 10);
+                    ctx.moveTo(center - arrowSize, 10 + arrowSize);
+                    ctx.lineTo(center, 10);
+                    ctx.lineTo(center + arrowSize, 10 + arrowSize);
+                    ctx.stroke();
+
+                    // Draw Unit Circle
+                    ctx.strokeStyle = '#9ca3af'; // gray-400
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(center, center, radius, 0, 2 * Math.PI);
+                    ctx.stroke();
+
+                    // --- Angle Visualization ---
+                    const startAngle = 0;
+                    const endAngle = -angleRad; // Negative for counter-clockwise in canvas arc
+
+                    // Draw Angle Arc
+                    ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+                    ctx.strokeStyle = '#ef4444'; // red-500
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(center, center);
+                    ctx.arc(center, center, radius * 0.4, startAngle, endAngle, true);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Draw Terminal Arm
+                    const endX = center + radius * Math.cos(angleRad);
+                    const endY = center - radius * Math.sin(angleRad); // Invert Y for canvas coords
+                    ctx.strokeStyle = '#ef4444'; // red-500
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(center, center);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+
+                    // REMOVED: Draw Angle Label
+                    /*
+                    ctx.fillStyle = '#c2410c'; // orange-700
+                    ctx.font = "bold 14px Inter, sans-serif";
+                    const labelRadius = radius * 0.55;
+                    const labelAngle = angleRad / 2;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.save();
+                    ctx.translate(center + labelRadius * Math.cos(labelAngle), center - labelRadius * Math.sin(labelAngle));
+                    ctx.rotate(-labelAngle); // Rotate text to align with angle
+                    ctx.fillText(`${angleDeg}°`, 0, 0);
+                    ctx.restore();
+                    */
+                    
+                    // Draw Quadrant Labels
+                    ctx.fillStyle = '#6b7280'; // gray-500
+                    ctx.font = "16px Inter, sans-serif";
+                    const quadOffset = center * 0.5;
+                    ctx.fillText("I", center + quadOffset, center - quadOffset);
+                    ctx.fillText("II", center - quadOffset, center - quadOffset);
+                    ctx.fillText("III", center - quadOffset, center + quadOffset);
+                    ctx.fillText("IV", center + quadOffset, center + quadOffset);
+                }
+
+                disableInputs(isCorrect, correctButton) {
+                    const buttons = this.elements.mcqOptionsContainer.querySelectorAll('.mcq-btn');
+                    buttons.forEach(btn => {
+                        btn.disabled = true;
+                        if (btn.dataset.answer === correctButton) {
+                            btn.classList.add('correct');
+                        } else if (!isCorrect && btn.classList.contains('incorrect')) {
+                            // Already marked by the click handler
+                        } else {
+                            btn.classList.add('opacity-50');
+                        }
+                    });
+                }
+
+                showFeedback(msg, isCorrect) {
+                    this.elements.feedbackMessage.classList.remove('is-visible');
+                    this.elements.feedbackMessage.innerHTML = msg; // Use innerHTML for MathJax
+                    this.elements.feedbackMessage.className = `feedback my-4 text-lg math-container ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}`;
+                    
+                    if (window.MathJax) {
+                        MathJax.Hub.Queue(
+                            ["Typeset", MathJax.Hub, this.elements.feedbackMessage],
+                            () => {
+                                this.elements.feedbackMessage.classList.add('is-visible');
+                            }
+                        );
+                    } else {
+                        this.elements.feedbackMessage.classList.add('is-visible');
+                    }
+                }
+                clearFeedback() { 
+                    this.elements.feedbackMessage.innerHTML = ''; 
+                    this.elements.feedbackMessage.className = 'feedback my-4 text-lg math-container';
+                    this.elements.feedbackMessage.classList.remove('is-visible');
+                }
+                
+                showSuccess(levelName, time, rating, isNewBest, prevBest) {
+                    this.elements.completedLevel.textContent = levelName;
+                    this.elements.finalTime.textContent = this.formatTime(time);
+                    this.elements.finalRating.textContent = rating.name;
+                    this.elements.ratingExplanation.textContent = 'Ratings are based on average time per question. Under 4s is Mastery level!';
+                    this.elements.bestTimeMessage.textContent = isNewBest ? "🏆 New best time!" : `Your best is ${this.formatTime(prevBest)}. Keep trying!`;
+                    this.showScreen('success');
+                }
+                formatTime(seconds) {
+                    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    const s = (seconds % 60).toString().padStart(2, '0');
+                    return `${m}:${s}`;
+                }
+            }
+
+            // ==================== Main Game Controller (Unchanged) ====================
+            class GameController {
+                constructor() {
+                    this.state = new GameState();
+                    this.ui = new UIManager();
+                    this.questionGen = new QuestionGenerator();
+                    this.timer = new Timer(document.getElementById('timer'));
+                    this.confetti = new ConfettiManager(document.getElementById('confetti-canvas'));
+                    this.isAnswering = false;
+                    this.setupEventListeners();
+                    this.init();
+                }
+
+                init() {
+                    this.ui.renderLevelGrid(CONFIG.LEVEL_GROUPS, (level) => this.startGame(level));
+                    this.ui.showScreen('settings');
+                }
+
+                setupEventListeners() {
+                    this.ui.elements.quitBtn.addEventListener('click', () => this.quitGame());
+                    this.ui.elements.playAgainBtn.addEventListener('click', () => this.quitGame());
+                }
+
+                startGame(level) {
+                    this.state.setLevel(level);
+                    this.ui.updateStreak(0);
+                    this.ui.showScreen('game');
+                    this.timer.start();
+                    this.generateQuestion();
+                }
+
+                generateQuestion() {
+                    this.isAnswering = false;
+                    const question = this.questionGen.generate(this.state.currentLevel);
+                    this.state.correctAnswer = question.answer;
+                    this.ui.showQuestion(question, this.state.currentLevel.type, (selectedAnswer, button) => this.handleSelection(selectedAnswer, button));
+                }
+
+                handleSelection(selectedAnswer, button) {
+                    if (this.isAnswering) return;
+                    this.isAnswering = true;
+
+                    const isCorrect = selectedAnswer === this.state.correctAnswer;
+                    
+                    if (isCorrect) {
+                        this.handleCorrectAnswer(button);
+                    } else {
+                        this.handleIncorrectAnswer(button);
+                    }
+                }
+
+                handleCorrectAnswer(button) {
+                    const streak = this.state.incrementStreak();
+                    this.ui.updateStreak(streak);
+                    const feedback = this._getRandom(CONFIG.POSITIVE_FEEDBACK);
+                    this.ui.showFeedback(feedback, true);
+                    this.confetti.trigger(CONFIG.CONFETTI.CORRECT);
+                    
+                    button.classList.add('correct');
+                    this.ui.disableInputs(true, this.state.correctAnswer);
+                    
+                    setTimeout(() => {
+                        if (this.state.isComplete()) this.showSuccess();
+                        else this.generateQuestion();
+                    }, CONFIG.FEEDBACK_DELAY_CORRECT);
+                }
+
+                handleIncorrectAnswer(button) {
+                    this.state.resetStreak();
+                    this.ui.updateStreak(0);
+                    this.timer.reset();
+                    this.timer.start();
+                    
+                    button.classList.add('incorrect');
+                    this.ui.disableInputs(false, this.state.correctAnswer);
+                    this.ui.showFeedback(`Not quite. The correct answer was ${this.state.correctAnswer}.`, false);
+
+                    setTimeout(() => this.generateQuestion(), CONFIG.FEEDBACK_DELAY_INCORRECT);
+                }
+
+                showSuccess() {
+                    this.timer.stop();
+                    const time = this.timer.getSeconds();
+                    const prevBest = StorageManager.getBestTime(this.state.currentLevel.key);
+                    const isNewBest = !prevBest || time < prevBest;
+                    
+                    if (isNewBest) {
+                        StorageManager.saveBestTime(this.state.currentLevel.key, time);
+                        this.confetti.trigger(CONFIG.CONFETTI.SUCCESS);
+                    }
+                    
+                    const rating = StorageManager.getRating(time);
+                    this.ui.showSuccess(this.state.currentLevel.name, time, rating, isNewBest, prevBest);
+                }
+
+                quitGame() {
+                    this.timer.stop();
+                    this.state.reset();
+                    this.init();
+                }
+
+                _getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+            }
+
+            // ==================== Initialize Game ====================
+            return { init: () => new GameController() };
+        })();
+
+        // Start the game when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => TrigFactsGame.init());
+    </script>
+</body>
+</html>
