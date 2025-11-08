@@ -1,0 +1,419 @@
+/* Trig Facts Challenge - AlgebraMastery-inspired styling */
+
+:root {
+    --color-primary: #3b82f6;
+    --color-primary-dark: #0062ff;
+    --color-success: #10b981;
+    --color-error: #e86565;
+    --color-gray-100: #f3f4f6;
+    --color-gray-300: #d1d5db;
+    --color-gray-500: #6b7280;
+    --color-gray-700: #374151;
+    --color-gray-900: #1f2937;
+    --shadow-card: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --transition-base: all 0.3s ease-in-out;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-900);
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.card {
+    background-color: white;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-base);
+    width: 95%;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.btn {
+    display: inline-block;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    text-align: center;
+    border: none;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: var(--color-success);
+    color: white;
+    width: 100%;
+    max-width: 300px;
+    font-size: 1.1rem;
+    padding: 1rem;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: #059669;
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Question display */
+.question-text {
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    font-weight: 700;
+    color: var(--color-gray-900);
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+/* Feedback messages */
+.feedback {
+    min-height: 2.5rem;
+    font-weight: 600;
+    transition: var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.feedback-correct {
+    color: var(--color-success);
+}
+
+.feedback-incorrect {
+    color: var(--color-error);
+}
+
+/* Timer paused message */
+#timer-paused-message {
+    background-color: rgba(249, 115, 22, 0.1);
+    color: #b45309;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    margin: 1rem 0;
+    font-weight: 600;
+    text-align: center;
+    border-left: 4px solid #f97316;
+}
+
+#timer-paused-message.hidden {
+    display: none;
+}
+
+/* Level selection */
+.level-section-title {
+    text-align: left;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-gray-700);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.level-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+}
+
+.level-btn {
+    border: 2px solid #e5e7eb;
+    border-radius: 1rem;
+    padding: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    user-select: none;
+}
+
+.level-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.level-title {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.best-time {
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+/* Rating-based colors */
+.rating-none {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.rating-beginner {
+    background: linear-gradient(135deg, #f8fafc, #94a3b8);
+    color: #1e293b;
+}
+
+.rating-developing {
+    background: linear-gradient(135deg, #dcfce7, #4ade80);
+    color: #047857;
+}
+
+.rating-expert {
+    background: linear-gradient(135deg, #ecfdf5, #34d399);
+    color: #065f46;
+}
+
+.rating-mastery {
+    background: linear-gradient(135deg, #fefbeb, #fbbf24);
+    color: #a16207;
+}
+
+.rating-true-mastery {
+    background: linear-gradient(135deg, #fef7f0, #f9a8d4);
+    color: #9d174d;
+}
+
+/* Confetti canvas */
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* Selectively reset Tailwind preflight styles inside MathQuill containers */
+.mathquill-editable {
+    /* Reset problematic Tailwind preflight resets */
+    margin: 0;
+    border: 2px solid #0000FF;
+    padding: 10px;
+    line-height: normal;
+}
+
+/* MathQuill Input Styles */
+.mathquill-input {
+    min-width: 100px;
+    height: 100px;
+    border: 2px solid var(--color-primary);
+    border-radius: 0.5rem;
+    padding: 0.2rem;
+    font-size: 2rem;
+    background-color: white;
+    margin: 0 0.25rem;
+    transition: all 0.2s ease-in-out;
+    box-sizing: border-box;
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.mathquill-input .mq-root-block {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+}
+
+.mathquill-input:focus-within {
+    border-color: var(--color-primary-dark);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.mathquill-input.correct {
+    border-color: var(--color-success);
+    background-color: rgba(16, 185, 129, 0.05);
+}
+
+.mathquill-input.incorrect {
+    border-color: var(--color-error);
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+/* Quadrant diagram styling */
+#quadrant-diagram {
+    touch-action: none;
+    user-select: none;
+}
+
+.diagram-container {
+    padding: 1rem;
+    background: linear-gradient(145deg, #f9fafb, #f3f4f6);
+    border-radius: 1rem;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Utility classes */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-6 {
+    margin-top: 1.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.mb-6 {
+    margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+    margin-bottom: 2rem;
+}
+
+.my-4 {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.my-6 {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.my-8 {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.p-4 {
+    padding: 1rem;
+}
+
+.rounded-xl {
+    border-radius: 0.75rem;
+}
+
+/* Keyboard Key Display (for shortcuts) */
+.dcg {
+    padding: 3px 5px;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    white-space: nowrap;
+    line-height: 2em;
+    margin: 0 1px;
+}
+
+/* Animation */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .card {
+        width: 100%;
+        padding: 1.5rem;
+    }
+
+    .question-text {
+        font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+
+    .level-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .level-btn {
+        min-height: 80px;
+        padding: 0.75rem;
+    }
+
+    .level-title {
+        font-size: 0.8rem;
+    }
+
+    .mathquill-input {
+        min-width: 80px;
+        width: 80px;
+        min-height: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 0.5rem;
+    }
+
+    .card {
+        padding: 1rem;
+        border-radius: 1rem;
+    }
+
+    .level-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+
+    .question-text {
+        font-size: clamp(1.2rem, 3vw, 1.8rem);
+    }
+
+    .mathquill-input {
+        min-width: 70px;
+        width: 70px;
+        min-height: 50px;
+        height: 50px;
+        font-size: 1rem;
+    }
+}
