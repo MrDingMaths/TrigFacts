@@ -403,12 +403,32 @@ class TrigUI {
         document.addEventListener('keydown', this.handleSuccessScreenKey);
     }
 
-    showSuccess(levelName, time, rating, isNewBest, previousBest) {
+    showSuccess(levelName, time, rating, isNewBest, previousBest, levelKey) {
         this.elements.completedLevel.textContent = levelName;
         this.elements.finalTime.textContent = new Timer().formatTime(time);
         this.elements.finalRating.textContent = rating.name;
-        this.elements.ratingExplanation.textContent =
-            `(Avg time per question: < ${rating.maxAvg}s)`;
+
+        // Calculate next rating target
+        const nextTarget = RatingUtils.getNextRatingTarget(
+            rating.key,
+            levelKey,
+            CONFIG.REQUIRED_STREAK
+        );
+
+        if (nextTarget) {
+            // Not at top rating - show next target time
+            const targetTime = nextTarget.targetTime.toFixed(1);
+            this.elements.ratingExplanation.textContent =
+                `Complete in ${targetTime}s or less for ${nextTarget.nextRating.name}`;
+        } else {
+            // Already at top rating - show the threshold they beat
+            const multiplier = CONFIG.LEVEL_DIFFICULTY_MULTIPLIERS[levelKey]
+                || CONFIG.LEVEL_DIFFICULTY_MULTIPLIERS['default']
+                || 1.0;
+            const threshold = (rating.maxAvg * multiplier * CONFIG.REQUIRED_STREAK).toFixed(1);
+            this.elements.ratingExplanation.textContent =
+                `You beat the threshold of ${threshold}s for ${rating.name}`;
+        }
 
         if (isNewBest) {
             this.elements.bestTimeMessage.textContent = previousBest

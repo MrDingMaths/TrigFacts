@@ -159,10 +159,15 @@ class TrigGameController {
             const moveToNextQuestion = (e) => {
                 // Filter for valid keys (not meta/modifier keys)
                 if (e.key.length === 1 || e.key === 'Enter' ||
-                    e.key === 'Backspace' || e.key === 'Delete') {
+                    e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Escape') {
 
                     // Remove listener immediately (one-time use)
                     document.removeEventListener('keydown', moveToNextQuestion);
+
+                    // If Escape, let the main handler deal with it (don't advance question)
+                    if (e.key === 'Escape') {
+                        return;
+                    }
 
                     // Execute transition sequence
                     this.ui.hideTimerPausedMessage();
@@ -206,7 +211,8 @@ class TrigGameController {
             time,
             rating,
             isNewBest,
-            previousBest
+            previousBest,
+            this.state.currentLevel.key
         );
     }
 
