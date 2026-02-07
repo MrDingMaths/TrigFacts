@@ -54,6 +54,7 @@ class TrigGameController {
     startGame(level) {
         this.state.setLevel(level);
         this.ui.showScreen('game');
+        this.ui.updateLevelName(level.name);
         this.ui.updateStreak(0);
         this.ui.hideTimerPausedMessage();
         this.timer.start();
@@ -198,7 +199,7 @@ class TrigGameController {
             this.confetti.trigger(CONFIG.CONFETTI.SUCCESS);
         }
 
-        const rating = StorageManager.getRating(time);
+        const rating = StorageManager.getRating(time, this.state.currentLevel.key);
 
         this.ui.showSuccess(
             this.state.currentLevel.name,

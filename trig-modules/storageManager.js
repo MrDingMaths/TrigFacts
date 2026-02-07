@@ -20,9 +20,8 @@ class StorageManager {
         }
     }
 
-    static getRating(time) {
-        const avgTime = time / CONFIG.REQUIRED_STREAK;
-        return CONFIG.RATING_THRESHOLDS.find(r => avgTime <= r.maxAvg);
+    static getRating(time, levelKey) {
+        return RatingUtils.getRating(time, levelKey, CONFIG.REQUIRED_STREAK);
     }
 
     static clearAllData() {

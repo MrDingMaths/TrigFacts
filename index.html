@@ -51,6 +51,9 @@
                 </div>
             </div>
 
+            <!-- Level Name Display -->
+            <div id="level-name" class="text-center text-gray-700 text-xl mb-4"></div>
+
             <!-- Timer Paused Message -->
             <div id="timer-paused-message" class="hidden font-semibold text-orange-600">
                 Time reset & paused
@@ -136,14 +139,29 @@
             FEEDBACK_DELAY_INCORRECT: 1500,
             POSITIVE_FEEDBACK: ["Correct!", "Excellent!", "Nice one!", "Perfect!", "You know it!", "Awesome!", "Great!"],
             RATING_THRESHOLDS: [
-                { maxAvg: 3, name: "💖 Unit Circle Queen 💖", key: "true-mastery" },
-                { maxAvg: 4, name: "⚡️ Trig Master ⚡️", key: "mastery" },
-                { maxAvg: 6, name: "Expert", key: "expert" },
-                { maxAvg: 8, name: "Pro", key: "pro" },
+                { maxAvg: 2, name: "💖 Unit Circle Queen 💖", key: "true-mastery" },
+                { maxAvg: 3, name: "⚡️ Trig Master ⚡️", key: "mastery" },
+                { maxAvg: 4, name: "Expert", key: "expert" },
+                { maxAvg: 5, name: "Pro", key: "pro" },
                 { maxAvg: Infinity, name: "Apprentice", key: "apprentice" }
             ],
             STORAGE_PREFIX: 'tf_bestTime_v5_',
-            CONFETTI: { CORRECT: 40, SUCCESS: 150 }
+            CONFETTI: { CORRECT: 40, SUCCESS: 150 },
+            LEVEL_DIFFICULTY_MULTIPLIERS: {
+                'simplify_fractions': 1.0,   // Pure arithmetic
+                'exact_deg_mixed': 1,      // Basic recall (degrees)
+                'deg_to_rad': 2.0,           // Conversion formula
+                'rad_to_deg': 2.0,           // Conversion formula
+                'conv_mixed': 2.5,           // Mixed direction conversion
+                'reference_angles': 1.0,     // Reference angles (degrees)
+                'exact_rad_mixed': 3.0,      // Exact values in radians
+                'reference_angles_rad': 3.5, // Reference angles (radians)
+                'quad_deg': 4.0,             // All quadrants (degrees)
+                'equiv_deg': 4.0,            // Equivalent ratios (degrees)
+                'quad_rad': 5.0,             // All quadrants (radians)
+                'equiv_rad': 5.0,            // Equivalent ratios (radians)
+                'default': 1.0
+            }
         };
     </script>
 
@@ -160,6 +178,7 @@
     <script src="trig-modules/trigGameState.js"></script>
     <script src="trig-modules/timer.js"></script>
     <script src="trig-modules/storageManager.js"></script>
+    <script src="trig-modules/ratingUtils.js"></script>
     <script src="trig-modules/trigAnswerChecker.js"></script>
     <script src="trig-modules/confetti.js"></script>
     <script src="trig-modules/quadrantDiagramRenderer.js"></script>

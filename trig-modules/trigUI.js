@@ -25,6 +25,7 @@ class TrigUI {
             finalRating: document.getElementById('final-rating'),
             bestTimeMessage: document.getElementById('best-time-message'),
             ratingExplanation: document.getElementById('rating-explanation'),
+            levelName: document.getElementById('level-name'),
         };
 
         this.diagramRenderer = new QuadrantDiagramRenderer(this.elements.diagramCanvas);
@@ -53,7 +54,7 @@ class TrigUI {
 
             levelGroups[groupName].forEach(level => {
                 const bestTime = StorageManager.getBestTime(level.key);
-                const rating = bestTime ? StorageManager.getRating(bestTime) : null;
+                const rating = bestTime ? StorageManager.getRating(bestTime, level.key) : null;
                 const ratingClass = rating ? `rating-${rating.key}` : 'rating-none';
 
                 const btn = this.createEl('div', {
@@ -292,6 +293,10 @@ class TrigUI {
         if (this.mathField) {
             this.mathField.config({ disabled: false });
         }
+    }
+
+    updateLevelName(levelName) {
+        this.elements.levelName.innerHTML = levelName;
     }
 
     updateStreak(streak) {
